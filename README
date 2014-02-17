@@ -1,1 +1,5 @@
-This file was created by IntelliJ IDEA 12.1.6 for binding GitHub repository
+Port for activemq from https://github.com/hornetq/hornetq/tree/master/examples/javaee
+
+mostly removed messaging config and added resource-adapter module config
+
+The eap profile works once there is an eap 6.2.0 install in ea-install/target
