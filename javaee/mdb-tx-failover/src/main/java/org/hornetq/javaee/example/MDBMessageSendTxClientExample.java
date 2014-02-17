@@ -98,7 +98,6 @@ public class MDBMessageSendTxClientExample
 
           TextMessage message = null;
           while (countDownLatch.getCount() > 0) {
-              message = null;
               int tryCount = 0;
               do {
                 message = (TextMessage) messageConsumer.receive(5000);
