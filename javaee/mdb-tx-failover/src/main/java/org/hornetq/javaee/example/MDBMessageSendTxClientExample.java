@@ -12,6 +12,10 @@
  */
 package org.hornetq.javaee.example;
 
+import java.util.HashMap;
+import java.util.Properties;
+import java.util.Vector;
+import java.util.concurrent.CountDownLatch;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.MessageConsumer;
@@ -22,12 +26,6 @@ import javax.jms.TextMessage;
 import javax.jms.TransactionRolledBackException;
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import java.lang.RuntimeException;
-import java.util.HashMap;
-import java.util.Properties;
-import java.util.Vector;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author <a href="mailto:andy.taylor@jboss.org">Andy Taylor</a>
@@ -96,7 +94,7 @@ public class MDBMessageSendTxClientExample
 
           System.out.println("Consuming all using : " + messageConsumer);
 
-          TextMessage message = null;
+          TextMessage message;
           while (countDownLatch.getCount() > 0) {
               int tryCount = 0;
               do {
