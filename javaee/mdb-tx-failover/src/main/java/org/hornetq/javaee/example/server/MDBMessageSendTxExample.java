@@ -30,6 +30,8 @@ import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TextMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author <a href="mailto:andy.taylor@jboss.org">Andy Taylor</a>
@@ -46,6 +48,7 @@ import javax.jms.TextMessage;
 @ResourceAdapter("activemq-rar.rar")
 public class MDBMessageSendTxExample implements MessageListener
 {
+   Logger LOG = LoggerFactory.getLogger(MDBMessageSendTxExample.class);
    @Resource(mappedName = "java:/JmsXA")
    ConnectionFactory connectionFactory;
 
@@ -63,7 +66,7 @@ public class MDBMessageSendTxExample implements MessageListener
          //Step 10. get the text from the message.
          String text = textMessage.getText();
 
-         System.out.println("message " + text);
+         LOG.info("got message " + message.getJMSMessageID() + " with: " + text);
 
          //Step 11. we create a JMS connection
          conn = connectionFactory.createConnection();
@@ -75,7 +78,9 @@ public class MDBMessageSendTxExample implements MessageListener
          MessageProducer producer = sess.createProducer(replyQueue);
 
          //Step 14. we create a message and send it
-         producer.send(sess.createTextMessage("r:" + text));
+         TextMessage reply = sess.createTextMessage("r:" + text);
+         producer.send(reply);
+         LOG.info("sent:" + reply.getJMSMessageID() + " with: " + reply.getText() + " in: " + reply.getStringProperty("JMSXProducerTXID"));
 
       }
       catch (Exception e)

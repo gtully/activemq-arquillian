@@ -26,14 +26,18 @@ import javax.jms.TextMessage;
 import javax.jms.TransactionRolledBackException;
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author <a href="mailto:andy.taylor@jboss.org">Andy Taylor</a>
  */
 public class MDBMessageSendTxClientExample
 {
+   static Logger LOG = LoggerFactory.getLogger(MDBMessageSendTxClientExample.class);
    public static void main(String[] args) throws Exception
    {
+
       Connection connection = null;
       InitialContext initialContext = null;
       try
@@ -72,13 +76,13 @@ public class MDBMessageSendTxClientExample
           System.out.println("Client using connection: " + connection);
           Vector<String> replys = new Vector<String>();
           HashMap<String, Exception> exMap = new HashMap<String, Exception>();
-          final int messagecount = 500;
+          final int messagecount = 1000;
           CountDownLatch countDownLatch = new CountDownLatch(messagecount);
           for (int i=0; i<messagecount; i++) {
               //Step 7. Create a Text Message
-              TextMessage message = session.createTextMessage(""+i);
+              TextMessage message = session.createTextMessage(">>"+i +"<<" );
 
-              System.out.println("Sent message: " + message.getText());
+              LOG.info("Sent message: " + message.getText());
 
               //Step 8. Send the Message
               producer.send(message);
@@ -86,7 +90,7 @@ public class MDBMessageSendTxClientExample
           }
           session.commit();
 
-          System.out.println("Sent all using connection: " + connection);
+          LOG.info("Sent all using connection: " + connection);
 
           queue = (Queue) initialContext.lookup("jms/queues/replyQueue");
 
@@ -100,16 +104,19 @@ public class MDBMessageSendTxClientExample
               do {
                 message = (TextMessage) messageConsumer.receive(5000);
                 if (message == null) {
-                    System.out.println("for message " + countDownLatch.getCount() + " try:" + ++tryCount);
-                    System.out.println("pending replys: " + replys);
+                    LOG.info("for message " + countDownLatch.getCount() + " try:" + ++tryCount);
+                    LOG.info("pending replys: " + replys);
                     if (tryCount > 3) {
+                        LOG.info("exceptionMap: " + exMap.keySet());
+
                         // is this an indoubt case of local tx commit failure
-                        if (replys.size() == exMap.size()) {
+                        if (!exMap.isEmpty()) {
                             if (exMap.get(replys.get(0)) instanceof TransactionRolledBackException) {
 
                                 // commit in doubt
                                 System.out.println("found ex for reply: " + replys.get(0) + ", " + exMap.get(replys.get(0)));
                                 countDownLatch.countDown();
+                                replys.remove(0);
                                 break;
                             }
                         }
@@ -118,16 +125,17 @@ public class MDBMessageSendTxClientExample
               } while (message == null);
 
               if (message != null) {
-                  System.out.println("reply message.getText() = " + message.getText());
+                  LOG.info("reply:" + message.getJMSMessageID() + " with: " + message.getText() + " from producer tx: " + message.getStringProperty("JMSXProducerTXID"));
                   try {
                       session.commit();
                       countDownLatch.countDown();
                       replys.remove(message.getText());
                   } catch (TransactionRolledBackException indoubt) {
-                      System.out.println("exception on commit, rollback for receive:" + message.getText() + ", reason: " + indoubt);
+                      LOG.info("rollback exception on commit, rollback for receive:" + message.getText() + ", reason: " + indoubt);
                       exMap.put(message.getText(), indoubt);
+                      session.rollback();
                   } catch (Exception sometimes) {
-                      System.out.println("exception on commit, rollback for receive:" + message + ", reason: " + sometimes);
+                      LOG.error("exception on commit, rollback for receive:" + message + ", reason: " + sometimes, sometimes);
                       sometimes.printStackTrace();
                       session.rollback();
                   }

@@ -22,6 +22,7 @@
 package org.hornetq.javaee.examples;
 
 import org.apache.activemq.broker.BrokerService;
+import org.slf4j.LoggerFactory;
 import org.hornetq.javaee.example.MDBMessageSendTxClientExample;
 import org.hornetq.javaee.example.server.MDBMessageSendTxExample;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -35,10 +36,12 @@ import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
 
 import java.io.InputStream;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author <a href="mailto:andy.taylor@jboss.org">Andy Taylor</a>
@@ -48,6 +51,7 @@ import java.util.concurrent.TimeUnit;
 @RunWith(Arquillian.class)
 public class MDBCMTTxSendRunnerTest
 {
+   Logger LOG = LoggerFactory.getLogger(MDBCMTTxSendRunnerTest.class);
    @Deployment
    public static Archive getDeployment()
    {
@@ -72,32 +76,35 @@ public class MDBCMTTxSendRunnerTest
    @Test
    public void runExample() throws Exception
    {
-       final BrokerService brokerService = new BrokerService();
        final Vector<Exception> throwables = new Vector<Exception>();
-       brokerService.setDataDirectory("target");
-       brokerService.setBrokerName("willFailOver");
-       brokerService.addConnector("tcp://localhost:61616");
-       brokerService.setDeleteAllMessagesOnStartup(true);
-       brokerService.start();
-       System.out.println("Started broker: " + brokerService + " brokerService.addr:" + brokerService.getAdminView().getTransportConnectors());
 
+       final AtomicBoolean done = new AtomicBoolean(false);
        Thread restartThread = new Thread() {
 
            @Override
            public void run() {
 
+               int count=0;
                try {
-                   while (brokerService.getAdminView().getTotalDequeueCount() < 200) {
-                       TimeUnit.MILLISECONDS.sleep(200);
+                   while(!done.get()) {
+
+                       BrokerService brokerService = new BrokerService();
+                       brokerService.setDataDirectory("target");
+                       brokerService.setBrokerName("willFailOver");
+                       brokerService.addConnector("tcp://localhost:61616");
+                       brokerService.start();
+                       brokerService.waitUntilStarted();
+
+                       LOG.info("Started broker (" + (count++) + ") " + brokerService + ", addr:" + brokerService.getAdminView().getTransportConnectors());
+
+                       while (!done.get() && brokerService.getAdminView().getTotalDequeueCount() < 200) {
+                           TimeUnit.MILLISECONDS.sleep(200);
+                       }
+                       LOG.info("Stopping broker on dequeue count:" + brokerService.getAdminView().getTotalDequeueCount());
+                       brokerService.stop();
+                       brokerService.waitUntilStopped();
+                       TimeUnit.SECONDS.sleep(10);
                    }
-                   System.out.println("Stopping broker on dequeue count:" + brokerService.getAdminView().getTotalDequeueCount());
-                   brokerService.stop();
-                   brokerService.waitUntilStopped();
-                   System.out.println("Restarting broker...");
-                   brokerService.setDeleteAllMessagesOnStartup(false);
-                   brokerService.start(true);
-                   brokerService.waitUntilStarted();
-                   System.out.println("Restarted broker: " + brokerService  + " brokerService.addr:" + brokerService.getAdminView().getTransportConnectors());
 
                } catch (Exception e) {
                    e.printStackTrace();

@@ -260,7 +260,7 @@
                  defaultUser
              </config-property>
              <config-property name="ServerUrl">
-               failover:(tcp://localhost:61616)
+               failover:(tcp://localhost:61616)?maxReconnectAttempts=0
              </config-property>
            <connection-definitions>
                <connection-definition class-name="org.apache.activemq.ra.ActiveMQManagedConnectionFactory"
