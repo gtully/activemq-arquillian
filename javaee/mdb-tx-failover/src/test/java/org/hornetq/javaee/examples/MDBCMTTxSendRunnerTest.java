@@ -117,6 +117,7 @@ public class MDBCMTTxSendRunnerTest
        restartThread.start();
 
        MDBMessageSendTxClientExample.main(null);
+       done.set(true);
        restartThread.join(TimeUnit.SECONDS.toMillis(30));
        if (!throwables.isEmpty())  {
            throw throwables.get(0);

@@ -76,7 +76,7 @@ public class MDBMessageSendTxClientExample
           System.out.println("Client using connection: " + connection);
           Vector<String> replys = new Vector<String>();
           HashMap<String, Exception> exMap = new HashMap<String, Exception>();
-          final int messagecount = 1000;
+          final int messagecount = 5000;
           CountDownLatch countDownLatch = new CountDownLatch(messagecount);
           for (int i=0; i<messagecount; i++) {
               //Step 7. Create a Text Message
@@ -142,7 +142,7 @@ public class MDBMessageSendTxClientExample
               }
           }
 
-          System.out.println("Consumed all  : " + countDownLatch);
+          LOG.info("Consumed all  : " + countDownLatch.getCount() + ", replys:" + replys + ", exceptionMap:" + exMap);
       }
       finally
       {
