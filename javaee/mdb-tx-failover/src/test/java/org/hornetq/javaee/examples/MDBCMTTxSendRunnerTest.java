@@ -21,7 +21,11 @@
 */
 package org.hornetq.javaee.examples;
 
+import org.apache.activemq.broker.BrokerPlugin;
 import org.apache.activemq.broker.BrokerService;
+import org.apache.activemq.security.AuthenticationUser;
+import org.apache.activemq.security.SimpleAuthenticationBroker;
+import org.apache.activemq.security.SimpleAuthenticationPlugin;
 import org.slf4j.LoggerFactory;
 import org.hornetq.javaee.example.MDBMessageSendTxClientExample;
 import org.hornetq.javaee.example.server.MDBMessageSendTxExample;
@@ -39,6 +43,7 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -88,10 +93,12 @@ public class MDBCMTTxSendRunnerTest
                try {
                    while(!done.get()) {
 
+                       LOG.info("Starting broker...");
                        BrokerService brokerService = new BrokerService();
                        brokerService.setDataDirectory("target");
                        brokerService.setBrokerName("willFailOver");
                        brokerService.addConnector("tcp://localhost:61616");
+                       brokerService.setPlugins(new BrokerPlugin[]{new SimpleAuthenticationPlugin(Arrays.asList(new AuthenticationUser[]{new AuthenticationUser("guest","password","guest")}))});
                        brokerService.start();
                        brokerService.waitUntilStarted();
 

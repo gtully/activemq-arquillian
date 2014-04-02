@@ -253,12 +253,8 @@
              <config-property name="UseInboundSession">
                  false
              </config-property>
-             <config-property name="Password">
-                 defaultPassword
-             </config-property>
-             <config-property name="UserName">
-                 defaultUser
-             </config-property>
+             <config-property name="UserName">guest</config-property>
+             <config-property name="Password">password</config-property>
              <config-property name="ServerUrl">
                failover:(tcp://localhost:61616)?maxReconnectAttempts=0
              </config-property>
@@ -292,7 +288,7 @@ jndi-name="java:/JmsXA" enabled="true" pool-name="ConnectionFactory">
               <config-property name="physicalName">replyQueue</config-property>
              </admin-object>
              <admin-object class-name="org.apache.activemq.ActiveMQConnectionFactory" jndi-name="jboss/exported/jms/RemoteConnectionFactory" use-java-context="true" pool-name="remoteConnectionFactory" enabled="true">
-              <config-property name="brokerURL">failover:(tcp://localhost:61616)</config-property>
+              <config-property name="brokerURL">failover:(tcp://localhost:61616)?jms.userName=guest&amp;jms.password=password</config-property>
              </admin-object>
            </admin-objects>
          </resource-adapter>
