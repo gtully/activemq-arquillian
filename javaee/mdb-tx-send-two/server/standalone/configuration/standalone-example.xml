@@ -72,7 +72,7 @@
                 <suffix value=".yyyy-MM-dd"/>
                 <append value="true"/>
             </periodic-rotating-file-handler>
-            <logger category="org.apache.activemq.ra.LocalAndXATransaction">
+            <logger category="org.apache.activemq.ra">
               <level name="TRACE"/>
             </logger>
             <logger category="com.arjuna">
@@ -324,7 +324,7 @@
         <subsystem xmlns="urn:jboss:domain:remoting:1.1">
             <connector name="remoting-connector" socket-binding="remoting" security-realm="ApplicationRealm"/>
         </subsystem>
-      <subsystem xmlns="urn:jboss:domain:resource-adapters:1.0">
+      <subsystem xmlns="urn:jboss:domain:resource-adapters:1.1">
         <resource-adapters>
          <resource-adapter>
              <archive>
@@ -346,9 +346,11 @@
            <config-property name="ServerUrl">
                tcp://localhost:61616
            </config-property>
+           <config-property name="useSessionArgs">false</config-property>
            <connection-definitions>
                <connection-definition class-name="org.apache.activemq.ra.ActiveMQManagedConnectionFactory"
 jndi-name="java:/JmsXA" enabled="true" pool-name="ConnectionFactory">
+                 <config-property name="useSessionArgs">false</config-property>
                    <xa-pool>
                        <min-pool-size>1</min-pool-size>
                        <max-pool-size>1</max-pool-size>
@@ -357,12 +359,23 @@ jndi-name="java:/JmsXA" enabled="true" pool-name="ConnectionFactory">
                </connection-definition>
              <connection-definition class-name="org.apache.activemq.ra.ActiveMQManagedConnectionFactory"
 jndi-name="java:/JmsXA2" enabled="true" pool-name="ConnectionFactory2">
+               <config-property name="useSessionArgs">false</config-property>
                  <xa-pool>
                      <min-pool-size>1</min-pool-size>
                      <max-pool-size>1</max-pool-size>
                  </xa-pool>
                <recovery no-recovery="false" />
              </connection-definition>
+
+             <connection-definition class-name="org.apache.activemq.ra.ActiveMQManagedConnectionFactory"
+ jndi-name="java:/JmsForU" enabled="true" pool-name="ConnectionFactory3">
+               <config-property name="useSessionArgs">true</config-property>
+                  <xa-pool>
+                      <min-pool-size>1</min-pool-size>
+                      <max-pool-size>1</max-pool-size>
+                  </xa-pool>
+                <recovery no-recovery="false" />
+              </connection-definition>
 
            </connection-definitions>
            <admin-objects>

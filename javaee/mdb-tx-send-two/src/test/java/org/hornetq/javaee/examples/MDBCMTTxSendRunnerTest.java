@@ -23,6 +23,7 @@ package org.hornetq.javaee.examples;
 
 import org.hornetq.javaee.example.MDBMessageSendTxClientExample;
 import org.hornetq.javaee.example.server.MDBMessageSendTxExample;
+import org.hornetq.javaee.example.server.UseJmsTxWithMcf;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
@@ -51,6 +52,7 @@ public class MDBCMTTxSendRunnerTest
 
       final JavaArchive ejbJar = ShrinkWrap.create(JavaArchive.class, "mdb.jar");
       ejbJar.addClass(MDBMessageSendTxExample.class);  // Generate the manifest with it's dependencies
+      ejbJar.addClass(UseJmsTxWithMcf.class);
      ejbJar.setManifest(new Asset()
      {
         public InputStream openStream()

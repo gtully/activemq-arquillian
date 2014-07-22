@@ -12,6 +12,8 @@
  */
 package org.hornetq.javaee.example.server;
 
+import com.sun.tools.javac.resources.compiler;
+import javax.jms.MessageConsumer;
 import org.jboss.ejb3.annotation.ResourceAdapter;
 
 import javax.annotation.Resource;

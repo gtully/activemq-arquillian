@@ -60,16 +60,8 @@ public class MDBMessageSendTxClientExample
          //Step 5. Create a JMS Session
          Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
-         //Step 6. Create a JMS Message Producer
-         MessageProducer producer = session.createProducer(queue);
-
-         //Step 7. Create a Text Message
-         TextMessage message = session.createTextMessage("This is a text message");
-
-         System.out.println("Sent message: " + message.getText());
-
-         //Step 8. Send the Message
-         producer.send(message);
+         // let the Timer bean send the kick off message
+         // org.hornetq.javaee.example.server.UseJmsTxWithMcf
 
          //Step 15. We lookup the reply queue
          queue = (Queue) initialContext.lookup("jms/queues/replyQueue");
@@ -81,7 +73,7 @@ public class MDBMessageSendTxClientExample
          connection.start();
 
          //Step 18. We receive the message and print it out
-         message = (TextMessage) messageConsumer.receive(5000);
+         TextMessage message = (TextMessage) messageConsumer.receive(5000);
 
          System.out.println("message.getText() = " + message.getText());
 
