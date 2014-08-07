@@ -1,0 +1,37 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.apache.activemq</groupId>
+    <artifactId>javaee</artifactId>
+    <version>0.1</version>
+  </parent>
+  <properties>
+    <broker-xml-config-url>xbean:file://${basedir}/target/jbossas-node0/standalone/configuration/broker-config.xml</broker-xml-config-url>
+    <amq-data-dir>${basedir}/target/amq-data</amq-data-dir>
+    <qpid-jms-version>0.26</qpid-jms-version>
+    <mqtt-client-version>1.10</mqtt-client-version>
+  </properties>
+
+
+  <artifactId>mdb-x-transports</artifactId>
+  <packaging>jar</packaging>
+  <name>JEE MDB various transports</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.qpid</groupId>
+      <artifactId>qpid-amqp-1-0-client-jms</artifactId>
+      <version>${qpid-jms-version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.fusesource.mqtt-client</groupId>
+      <artifactId>mqtt-client</artifactId>
+      <version>${mqtt-client-version}</version>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+</project>

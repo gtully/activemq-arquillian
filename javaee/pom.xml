@@ -36,6 +36,7 @@
     <module>mdb-tx-send</module>
     <module>mdb-tx-send-two</module>
     <module>mdb-tx-failover</module>
+    <module>mdb-x-transports</module>
   </modules>
 
   <dependencyManagement>
@@ -156,6 +157,7 @@
                 </resource>
                 <resource>
                   <directory>${basedir}/server</directory>
+                  <filtering>true</filtering>
                 </resource>
               </resources>
             </configuration>
