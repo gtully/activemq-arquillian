@@ -38,7 +38,7 @@
   <properties>
     <container-version></container-version>
     <arquillian-version>7.2.0.Final</arquillian-version>
-    <activemq.version>5.11-SNAPSHOT</activemq.version>
+    <activemq.version>5.14.0-SNAPSHOT</activemq.version>
     <slf4j-version>1.7.5</slf4j-version>
     <log4j-version>1.2.17</log4j-version>
     <maven-dependency-plugin-version>2.8</maven-dependency-plugin-version>

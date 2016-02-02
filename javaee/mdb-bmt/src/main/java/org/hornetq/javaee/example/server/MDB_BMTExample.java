@@ -18,8 +18,18 @@ import javax.ejb.MessageDriven;
 import javax.ejb.MessageDrivenContext;
 import javax.ejb.TransactionManagement;
 import javax.ejb.TransactionManagementType;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
 import javax.jms.Message;
 import javax.jms.MessageListener;
+import javax.jms.MessageProducer;
+import javax.jms.Queue;
+import javax.jms.QueueConnection;
+import javax.jms.QueueConnectionFactory;
+import javax.jms.QueueReceiver;
+import javax.jms.QueueSender;
+import javax.jms.QueueSession;
+import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.transaction.UserTransaction;
 
@@ -36,6 +46,13 @@ public class MDB_BMTExample implements MessageListener
 {
    @Resource
    MessageDrivenContext ctx;
+
+   @Resource(mappedName = "java:/JmsXA")
+   ConnectionFactory connectionFactory;
+
+   @Resource(mappedName = "java:/queue/replyQueue")
+   Queue replyQueue;
+
 
    public void onMessage(final Message message)
    {
@@ -62,6 +79,26 @@ public class MDB_BMTExample implements MessageListener
          {
             System.out.println("something is wrong, I was expecting a transaction");
          }
+
+         // try and mimic transactiontest.test01
+         QueueConnection conn = ((QueueConnectionFactory)connectionFactory).createQueueConnection();
+         conn.start();
+
+         QueueSession sess = conn.createQueueSession(true, 0);
+         QueueSender producer = sess.createSender(replyQueue);
+         QueueReceiver receiver = sess.createReceiver(replyQueue);
+
+         tx.begin();
+         System.out.println("session in tx:" + sess);
+         producer.send(message);
+         tx.commit();
+
+         System.out.println("session after tx:" + sess);
+         tx.begin();
+         TextMessage rsgRec = (TextMessage) receiver.receive(10000);  // throws exception here ??
+         System.out.println("received in tx: " + rsgRec);
+
+         tx.commit();
       }
       catch (Exception e)
       {
